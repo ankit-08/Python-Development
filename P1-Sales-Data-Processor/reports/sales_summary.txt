@@ -1,0 +1,43 @@
+Rows processed: 10003
+Rows skipped: 0
+Total Revenue: 19593456.00
+
+Product-wise totals:
+Widget A: Qty=9270, Revenue=4244120.00
+Widget D: Qty=9307, Revenue=3974089.00
+Widget E: Qty=9629, Revenue=3687907.00
+Widget B: Qty=9262, Revenue=3130418.00
+Widget F: Qty=8810, Revenue=2757530.00
+Widget C: Qty=8864, Revenue=1799392.00
+
+Daily totals:
+2025-11-01: Qty=1767, Revenue=624880.00
+2025-11-02: Qty=1836, Revenue=658498.00
+2025-11-03: Qty=2093, Revenue=741755.00
+2025-11-04: Qty=2056, Revenue=720918.00
+2025-11-05: Qty=1778, Revenue=617004.00
+2025-11-06: Qty=2018, Revenue=717531.00
+2025-11-07: Qty=1781, Revenue=635275.00
+2025-11-08: Qty=1644, Revenue=571336.00
+2025-11-09: Qty=1665, Revenue=604672.00
+2025-11-10: Qty=1949, Revenue=689694.00
+2025-11-11: Qty=1770, Revenue=623129.00
+2025-11-12: Qty=1754, Revenue=623471.00
+2025-11-13: Qty=1578, Revenue=553578.00
+2025-11-14: Qty=1880, Revenue=686353.00
+2025-11-15: Qty=1860, Revenue=664845.00
+2025-11-16: Qty=1877, Revenue=665989.00
+2025-11-17: Qty=1780, Revenue=628308.00
+2025-11-18: Qty=1837, Revenue=651381.00
+2025-11-19: Qty=1747, Revenue=622459.00
+2025-11-20: Qty=1728, Revenue=621223.00
+2025-11-21: Qty=1517, Revenue=537323.00
+2025-11-22: Qty=1940, Revenue=686600.00
+2025-11-23: Qty=1837, Revenue=654354.00
+2025-11-24: Qty=1830, Revenue=657139.00
+2025-11-25: Qty=1850, Revenue=649882.00
+2025-11-26: Qty=1985, Revenue=713114.00
+2025-11-27: Qty=1996, Revenue=716683.00
+2025-11-28: Qty=1924, Revenue=673642.00
+2025-11-29: Qty=1952, Revenue=702760.00
+2025-11-30: Qty=1913, Revenue=679660.00

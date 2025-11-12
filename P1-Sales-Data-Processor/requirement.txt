@@ -1,15 +1,1 @@
-Goal: Read daily sales data from text/CSV files, clean it, summarize totals, and write reports.
-
-#Input File Format: .CSV
-    product_name, catagory, quantity, price
-
-#Reading Rules: 
-    product_name: string
-    catagory: string
-    quantity: float
-    price: float
-    
-#Transaformation Logic:
-    Aggregates metrics: total revenue, product-wise revenue, product-wise quantity sold, daily totals.
-    Generates human-readable reports (text/CSV) and a summary JSON.
-    Supports incremental updates (append new daily files) and error logging.
+pytest    
