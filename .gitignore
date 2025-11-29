@@ -1,8 +1,23 @@
-*.ipynb
-.venv/
+# Ignore Python cache and environment
 __pycache__/
-*.ipynb
 .venv/
-*.ipynb
-.venv/
-__pycache__/
+*.pyc
+
+# Ignore pytest cache
+.pytest_cache/
+
+# Ignore CSV data files
+*.csv
+
+# Ignore data folders (in, out, err)
+data/in/
+data/out/
+data/err/
+
+# Ignore logs and reports
+logs/
+reports/
+
+# VSCode and system files
+.vscode/
+.DS
