@@ -4,12 +4,12 @@ import argparse
 import logging
 from src.processor import SalesProcessor
 
+ERROR_THRESHOLD = 5
+
 def ensure_dir(path: str):
-    """Create directory if it doesn't exist."""
     os.makedirs(path, exist_ok=True)
 
 def setup_logging():
-    """Configure logging to file + console."""
     log_dir = "logs"
     ensure_dir(log_dir)
     log_path = os.path.join(log_dir, "system.log")
@@ -27,77 +27,63 @@ def setup_logging():
     return log_path
 
 def main():
-    parser = argparse.ArgumentParser(
-        description=(
-            "Sales Data Processor — reads from data/in, writes reports to /reports, "
-            "moves processed files to /data/out, failed ones to /data/err, and logs to /logs/system.log"
-        )
-    )
-
-    # --- Default directories ---
-    default_input = os.path.join("data", "in")
-    default_out = "reports"
-    default_processed = os.path.join("data", "out")
-    default_error = os.path.join("data", "err")
-
-    parser.add_argument(
-        "input_dir",
-        nargs="?",
-        default=default_input,
-        help=f"Directory containing input CSV files (default: {default_input})"
-    )
-    parser.add_argument("--out", default=default_out, help=f"Reports folder (default: {default_out})")
-    parser.add_argument("--processed", default=default_processed, help=f"Processed files folder (default: {default_processed})")
-    parser.add_argument("--error", default=default_error, help=f"Error files folder (default: {default_error})")
-
+    parser = argparse.ArgumentParser(description="Sales Data Processor")
+    parser.add_argument("input_dir", nargs="?", default=os.path.join("data", "in"))
+    parser.add_argument("--out", default="reports")
+    parser.add_argument("--processed", default=os.path.join("data", "out"))
+    parser.add_argument("--error", default=os.path.join("data", "err"))
     args = parser.parse_args()
 
-    # --- Setup logging ---
     log_path = setup_logging()
 
-    # --- Ensure directories exist ---
-    for path in [args.input_dir, args.out, args.processed, args.error]:
-        ensure_dir(path)
+    for p in [args.input_dir, args.out, args.processed, args.error]:
+        ensure_dir(p)
 
     proc = SalesProcessor()
 
-    # --- Collect input CSVs ---
     csv_files = [
         os.path.join(args.input_dir, f)
         for f in os.listdir(args.input_dir)
-        if f.endswith(".csv")
+        if f.lower().endswith(".csv")
     ]
 
     if not csv_files:
-        logging.warning(f"No CSV files found in {args.input_dir}. Nothing to process.")
+        logging.warning("No CSV files found.")
         return
 
-    logging.info(f"INFO: Processing {len(csv_files)} file(s) from {args.input_dir}/ ...")
+    logging.info("Processing %d file(s)...", len(csv_files))
 
     for csv_path in csv_files:
+        fname = os.path.basename(csv_path)
         try:
-            proc.process_file(csv_path)
-            logging.info(f"✅ Processed: {os.path.basename(csv_path)}")
+            errors = proc.process_file(csv_path)
 
-            dest_path = os.path.join(args.processed, os.path.basename(csv_path))
-            shutil.move(csv_path, dest_path)
-            logging.info(f"📦 Moved to: {dest_path}")
-
-        except Exception as e:
-            logging.error(f"❌ Error processing {csv_path}: {e}")
-            err_path = os.path.join(args.error, os.path.basename(csv_path))
-            try:
+            if errors > ERROR_THRESHOLD:
+                err_path = os.path.join(args.error, fname)
                 shutil.move(csv_path, err_path)
-                logging.error(f"🚨 Moved to error folder: {err_path}")
-            except Exception as move_err:
-                logging.error(f"⚠️ Failed to move {csv_path} to error dir: {move_err}")
+                logging.warning(
+                    "🚨 File %s moved to ERR (row_errors=%d > %d)",
+                    fname, errors, ERROR_THRESHOLD
+                )
+            else:
+                out_path = os.path.join(args.processed, fname)
+                shutil.move(csv_path, out_path)
+                logging.info(
+                    "✅ File %s processed successfully (row_errors=%d)",
+                    fname, errors
+                )
+
+        except Exception:
+            logging.exception("❌ Fatal error processing %s", fname)
+            try:
+                shutil.move(csv_path, os.path.join(args.error, fname))
+            except Exception as e:
+                logging.error("Failed moving %s: %s", fname, e)
 
     proc.write_reports(args.out)
-    logging.info(f"🧾 Reports written to: {args.out}")
-    logging.info(f"📂 Success files moved to: {args.processed}")
-    logging.info(f"🚨 Error files moved to: {args.error}")
+    logging.info("🧾 Reports written to %s", args.out)
+    logging.info("📄 Logs saved to %s", log_path)
     logging.info("✅ All done!")
-    logging.info(f"📄 Logs saved to: {log_path}")
 
 if __name__ == "__main__":
     main()

@@ -1,4 +1,3 @@
-test# src/processor.py
 import logging
 from collections import defaultdict
 from .validators import parse_row, RowValidationError
@@ -31,8 +30,11 @@ class SalesProcessor:
 
     def process_file(self, filepath):
         """
-        Process a single CSV file. Collects errors via logging and increments rows_skipped.
+        Process a single CSV file.
+        Returns number of row-level errors found in this file.
         """
+        file_errors = 0
+
         try:
             for lineno, row in enumerate(read_csv_rows(filepath, skip_header=True), start=2):
                 try:
@@ -40,21 +42,24 @@ class SalesProcessor:
                 except RowValidationError as e:
                     logger.error("%s:%d - %s", filepath, lineno, e)
                     self.rows_skipped += 1
+                    file_errors += 1
                     continue
-                except Exception as e:
+                except Exception:
                     logger.exception("Unexpected error parsing %s:%d", filepath, lineno)
                     self.rows_skipped += 1
+                    file_errors += 1
                     continue
 
                 self.process_row(date_s, product, qty, price)
+
         except FileNotFoundError:
             logger.error("File not found: %s", filepath)
+            return 999
         except PermissionError:
             logger.error("Permission denied reading: %s", filepath)
+            return 999
 
-    def process_files(self, filepaths):
-        for f in filepaths:
-            self.process_file(f)
+        return file_errors
 
     def generate_text_report(self):
         lines = []
@@ -75,12 +80,10 @@ class SalesProcessor:
         txt = self.generate_text_report()
         write_text(f"{outdir}/sales_summary.txt", txt)
 
-        # product CSV
         prod_rows = [(p, v["quantity"], f"{v['revenue']:.2f}") for p, v in self.product_totals.items()]
         prod_rows.sort(key=lambda r: float(r[2]), reverse=True)
         write_csv(f"{outdir}/product_totals.csv", ["Product", "Quantity", "Revenue"], prod_rows)
 
-        # daily CSV
         daily_rows = [(d, v["quantity"], f"{v['revenue']:.2f}") for d, v in self.daily_totals.items()]
         daily_rows.sort()
         write_csv(f"{outdir}/daily_totals.csv", ["Date", "Quantity", "Revenue"], daily_rows)

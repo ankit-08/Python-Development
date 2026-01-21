@@ -6,7 +6,7 @@ import threading
 from datetime import datetime, timedelta
 
 # --- CONFIGURATION ---
-INTERVAL_SECONDS = 3    # ⏱ Time gap between file generations (now every 30 seconds)
+INTERVAL_SECONDS = 2    # ⏱ Time gap between file generations (now every 30 seconds)
 ROWS_PER_FILE = 100       # Rows per CSV
 START_DATE = datetime(2025, 11, 1)
 
